@@ -317,9 +317,9 @@ docker-compose -f docker-compose.dev.yml up --build
 After that I :
 
 - calling checkout 1-times `bf4dcf5b-a744-40c7-8f55-bf6481d70df3`
-- waiting for expiring and saw notify
+- waiting for expiring, you should see the notice
 - then calling checkout again 1-times on the same ID `bf4dcf5b-a744-40c7-8f55-bf6481d70df3`
-- waiting for expiring and saw notify
+- waiting for expiring, you should see the notice
 
 the console output should look like this :
 
