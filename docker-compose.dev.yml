@@ -1,0 +1,24 @@
+version: '3.6'
+services:
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+      - 1323:1323
+    volumes:
+      - ./:/app
+    restart: always
+
+  redis:
+    image: redis
+    ports:
+      - 1324:6379
+    volumes:
+      - ./redis:/data
+    restart: always
+
+networks:
+  default:
+    driver: bridge

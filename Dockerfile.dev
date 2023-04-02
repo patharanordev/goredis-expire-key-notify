@@ -1,0 +1,19 @@
+# syntax=docker/dockerfile:1
+
+# Build
+
+FROM golang:1.18-buster AS build
+
+WORKDIR /app
+
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download && \
+    go install github.com/cosmtrek/air@latest
+
+COPY *.go ./
+RUN chmod +x /app
+
+EXPOSE 8080
+
+ENTRYPOINT [ "air" ]
