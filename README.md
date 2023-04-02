@@ -17,15 +17,15 @@
 
 ### **APIs**
 
->
-> ***Assume Scenario***
+> **_Assume Scenario_**
 >
 > Creating simple APIs for checkout an order. If user do nothing within 20 seconds, the service clear the order automatically.
->
 
 #### **POST** - `/checkout`
 
-***`SET` command options***
+This endpoint allows user checkout the order, client must sending order ID to server. In the backend service, requires you to set key to `Redis` via `SET` command :
+
+**_`SET` command options_**
 
 The SET command supports a set of options that modify its behavior:
 
@@ -93,16 +93,20 @@ output:
 
 ```json
 {
-    "status": 200,
-    "data": {
-        "ttl": 0,
-        "value": "Set checkout ID : true"
-    },
-    "error": null
+  "status": 200,
+  "data": {
+    "ttl": 0,
+    "value": "Set checkout ID : true"
+  },
+  "error": null
 }
 ```
 
+> The field name `expire` in request body of this endpoint, used for demo only. It should be set in the backend service.
+
 #### **GET** - `/checkout/:id`
+
+This endpoint allows user or client side to get status of the order.
 
 ```go
 func GetOrder(keyPrefix string, id string) ResponseObj {
@@ -161,18 +165,18 @@ output:
 
 ```json
 {
-    "status": 200,
-    "data": {
-        "ttl": 17,
-        "value": "bf4dcf5b-a744-40c7-8f55-bf6481d70df3"
-    },
-    "error": null
+  "status": 200,
+  "data": {
+    "ttl": 17,
+    "value": "bf4dcf5b-a744-40c7-8f55-bf6481d70df3"
+  },
+  "error": null
 }
 ```
 
-### **Redis - Enable Expire Key Notify**
+### **Enable Expire Key Notify**
 
-Set config for `notify-keyspace-events` event, please refer to the config options below :
+To allow key notify in `Redis`, you must set config for `notify-keyspace-events` event first, please refer to the config options below :
 
 ```txt
 K     Keyspace events, published with __keyspace@<db>__ prefix.
@@ -192,7 +196,7 @@ n     New key events (Note: not included in the 'A' class)
 A     Alias for "g$lshztxed", so that the "AKE" string means all the events except "m" and "n".
 ```
 
-I using `KEA` :
+This case, I used `KEA` option :
 
 ```go
 _, err := rdb.Do(ctx, "CONFIG", "SET", "notify-keyspace-events", "KEA").Result()
@@ -260,7 +264,7 @@ func EnableKeyNotify() {
 
 ### **Main Thread**
 
-In main service, use above modules :
+In main service, calling above modules :
 
 ```go
 package main
@@ -312,9 +316,9 @@ docker-compose -f docker-compose.dev.yml up --build
 
 After that I :
 
-- calling checkout 2-times by the same ID `bf4dcf5b-a744-40c7-8f55-bf6481d70df3`
+- calling checkout 1-times `bf4dcf5b-a744-40c7-8f55-bf6481d70df3`
 - waiting for expiring and saw notify
-- then calling checkout 2-times by the same ID `bf4dcf5b-a744-40c7-8f55-bf6481d70df3`
+- then calling checkout again 1-times on the same ID `bf4dcf5b-a744-40c7-8f55-bf6481d70df3`
 - waiting for expiring and saw notify
 
 the console output should look like this :
